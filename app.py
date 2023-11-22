@@ -99,7 +99,7 @@ def getFile():
     path = session['my_path']
     cover_path = path + '/video.mp4'
 
-    return "http://163.180.160.104:5001/" + cover_path
+    return "http://163.180.160.37:5001/" + cover_path
     
 
 @app.route('/ai/deleteFile', methods=['GET'])
