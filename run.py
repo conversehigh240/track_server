@@ -139,4 +139,50 @@ cam_strategy = 'smooth' #@param ['smooth', 'source', 'copy'] {type:"raw"}
 run = 'python run_imitator.py --gpu_ids 0 --model imitator --output_dir ./outputs/results --src_path ./data/images/crop.jpg --tgt_path /content/images --save_res --bg_ks %d --ft_ks %d %s %s %s --cam_strategy %s'%(
     bg_ks, ft_ks, '--has_detector' if has_detector else '', '--post_tune' if post_tune else '', '--front_warp' if front_warp else '', cam_strategy)
 
-os.system(run)
+#os.system(run)
+{run}
+import subprocess
+
+# Command 1
+cmd1 = [
+    'ffmpeg',
+    '-f', 'image2',
+    '-i', './outputs/results/imitators/gt_%05d.jpg',
+    '-c:v', 'libx264',
+    '-c:a', 'aac',
+    '-pix_fmt', 'yuv420p',
+    '-profile:v', 'baseline',
+    '-movflags', '+faststart',
+    'out2.mp4',
+    '-y'
+]
+subprocess.run(cmd1)
+
+# Command 2
+cmd2 = [
+    'ffmpeg',
+    '-f', 'image2',
+    '-i', './outputs/results/imitators/pred_%05d.jpg',
+    '-c:v', 'libx264',
+    '-c:a', 'aac',
+    '-pix_fmt', 'yuv420p',
+    '-profile:v', 'baseline',
+    '-movflags', '+faststart',
+    '/content/output.mp4',
+    '-y'
+]
+subprocess.run(cmd2)
+
+# Command 3
+cmd3 = [
+    'ffmpeg',
+    '-i', 'out2.mp4',
+    '-i', './outputs/results/combined.mp4',
+    '-filter_complex', 'hstack',
+    '-pix_fmt', 'yuv420p',
+    '-profile:v', 'baseline',
+    '-movflags', '+faststart',
+    '/content/combined.mp4',
+    '-y'
+]
+subprocess.run(cmd3)
