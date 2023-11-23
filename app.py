@@ -1,4 +1,4 @@
-from flask import Flask, request, session
+from flask import Flask, request, url_for
 from werkzeug.utils import secure_filename
 import yt_dlp
 import os
@@ -7,7 +7,6 @@ import datetime
 import shutil
 
 app = Flask(__name__)
-app.secret_key = '8GAHkf10u2'
 
 @app.route('/ai/saveFile', methods = ['GET', 'POST'])
 def saveFile():
@@ -15,8 +14,6 @@ def saveFile():
     path = 'static/' + timestamp
     if not (os.path.isdir(path)):
         os.makedirs(path)
-
-    session['my_path'] = path
 
     if request.method == 'POST':
         img = request.files['img']
@@ -40,6 +37,10 @@ def saveFile():
 
         if os.path.isfile(img_path) and os.path.isfile(video_path) and os.path.isfile(rec_path):
             test.data_preprocessing(img_path, video_path, rec_path)
+        
+        check = url_for('checkFile', filepath = path)
+        get = url_for('getFile', filepath = path)
+        delete = url_for('deleteFile', filepath = path)
             
         return "completed"
     
@@ -50,8 +51,6 @@ def saveYouTube():
     path = 'static/' + timestamp
     if not (os.path.isdir(path)):
         os.makedirs(path)
-
-    session['my_path'] = path
 
     if request.method == 'POST':
         img = request.files['img']
@@ -81,33 +80,40 @@ def saveYouTube():
 
     return "completed"
 
-@app.route('/ai/checkFile', methods=['GET'])
-def checkFile():
-    if 'my_path' in session:
-        path = session['my_path']
-        cover_path = path + '/cover.txt'
+# @app.route('/ai/checkFile/<filepath>', methods=['GET'])
+# def checkFile(filepath):
+#     new_path = filepath
+#     cover_path = new_path + '/cover.txt'
 
-        if os.path.exists(cover_path):
-            return "True"
-        else:
-            return "False"
-    else:
-        return "path error"
+#     if os.path.exists(cover_path):
+#         return "True"
+#     else:
+#         return "False"
+
     
-@app.route('/ai/getFile', methods=['GET'])
-def getFile():
-    path = session['my_path']
-    cover_path = path + '/video.mp4'
+# @app.route('/ai/getFile/<filepath>', methods=['GET'])
+# def getFile(filepath):
+#     new_path = filepath
+#     cover_path = new_path + '/video.mp4'
 
-    return "http://163.180.160.37:5001/" + cover_path
+#     return "http://163.180.160.37:5001/" + cover_path
     
 
-@app.route('/ai/deleteFile', methods=['GET'])
-def deleteCover():
-    path = session['my_path']
-    shutil.rmtree(path)
+# @app.route('/ai/deleteFile/<filepath>', methods=['GET'])
+# def deleteFile(filepath):
+#     new_path = filepath
+#     img_path = filepath + '/image.png'
+#     vid_path = filepath + '/video.mp4'
+#     rec_path = filepath + '/record.m4a'
+
+#     os.remove(img_path)
+#     os.remove(vid_path)
+#     os.remove(rec_path)
+
+@app.route('/ai/temp', methods=['GET'])
+def temp():
+    return "http://163.180.160.37:5001/static/output.mp4"
     
-    return "file deleted successfully"
 
 if __name__ == '__main__':
     app.run(host = '0.0.0.0', port=5001)
